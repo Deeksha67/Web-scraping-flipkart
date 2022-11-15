@@ -1,0 +1,84 @@
+Pre requisite required for using python to scrape the website details: - 
+
+Python 2.x or Python 3.x with Selenium, BeautifulSoup libraries installed.
+
+1. Selenium
+pip install selenium  
+
+2. BeautifulSoup(we will be using it for extracting the data from HTML files. 
+pip install bs4  
+
+3. Install a parser
+BeautifulSoup supports HTML parser. 
+either install html5lib parser or lxml parser.
+pip install html5lib  
+         or 
+pip install lxml
+
+
+
+Code Begibs: - 
+
+
+from bs4 import BeautifulSoupas soup  
+from urllib.request import urlopen as uReq  
+  
+myurl = https://www.flipkart.com/search?q=macbook&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off  // Request from the webpage  
+  
+  
+uClient  = uReq(myurl)  
+page_html = uClient.read()  
+uClient.close()  
+  
+page_soup = soup(page_html, features="html.parser")  
+  
+# print(soup.prettify(containers[0]))  
+  
+# This variable held all html of webpage  
+containers = page_soup.find_all(<div class="_4rR01T">APPLE 2020 Macbook Air M1 - (8 GB/256 GB SSD/Mac OS Big Sur) MGN63HN/A</div>)  
+# container = containers[0]  
+# # print(soup.prettify(container))  
+#  
+# price = container.find_all(<div class="_25b18c"><div class="_30jeq3 _1_WHN1">₹87,990</div><div class="_3I9_wc _27UcVY">₹99,900</div><div class="_3Ay6Sb"><span>11% off</span></div></div>)
+# print(price[0].text)  
+#  
+# ratings = container.find_all(<div class="gUuXy-"><span id="productRating_LSTCOMFXEKMXWUMGPHWKF7Y8O_COMFXEKMXWUMGPHW_" class="_1lRcqv"><div class="_3LWZlK">4.7<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMyIgaGVpZ2h0PSIxMiI+PHBhdGggZmlsbD0iI0ZGRiIgZD0iTTYuNSA5LjQzOWwtMy42NzQgMi4yMy45NC00LjI2LTMuMjEtMi44ODMgNC4yNTQtLjQwNEw2LjUuMTEybDEuNjkgNC4wMSA0LjI1NC40MDQtMy4yMSAyLjg4Mi45NCA0LjI2eiIvPjwvc3ZnPg==" class="_1wB99o"></div></span><span class="_2_R_DZ"><span><span>8,143 Ratings&nbsp;</span><span class="_13vcmD">&amp;</span><span>&nbsp;740 Reviews</span></span></span></div>)
+# print(ratings[0].text)  
+#  
+# #  
+# # print(len(containers))  
+# print(container.div.img["alt"])  
+  
+
+filename = "product1.csv"  // Create CSV File to store all macbook data   
+f = open(filename,"w")  
+  
+headers = "Product_Name,Pricing,Ratings\n"  
+f.write(headers)  
+  
+for container in containers:  
+    product_name = container.div.img[<div class="CXW8mj" style="height: 200px; width: 200px;"><img class="_396cs4 _3exPp9" alt="APPLE 2020 Macbook Air M1 - (8 GB/256 GB SSD/Mac OS Big Sur) MGN63HN/A" src="https://rukminim1.flixcart.com/image/312/312/kp5sya80/screen-guard/tempered-glass/o/v/n/apple-macbook-air-m1-13-3-inch-lightwings-original-imag3gh5xftgbpg3.jpeg?q=70"></div>]  
+  
+    price_container = container.find_all(<div class="_25b18c"><div class="_30jeq3 _1_WHN1">₹87,990</div><div class="_3I9_wc _27UcVY">₹99,900</div><div class="_3Ay6Sb"><span>11% off</span></div></div>)  
+    price = price_container[0].text.strip()  
+  
+    rating_container = container.find_all(<div class="gUuXy-"><span id="productRating_LSTCOMFXEKMXWUMGPHWKF7Y8O_COMFXEKMXWUMGPHW_" class="_1lRcqv"><div class="_3LWZlK">4.7<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMyIgaGVpZ2h0PSIxMiI+PHBhdGggZmlsbD0iI0ZGRiIgZD0iTTYuNSA5LjQzOWwtMy42NzQgMi4yMy45NC00LjI2LTMuMjEtMi44ODMgNC4yNTQtLjQwNEw2LjUuMTEybDEuNjkgNC4wMSA0LjI1NC40MDQtMy4yMSAyLjg4Mi45NCA0LjI2eiIvPjwvc3ZnPg==" class="_1wB99o"></div></span><span class="_2_R_DZ"><span><span>8,143 Ratings&nbsp;</span><span class="_13vcmD">&amp;</span><span>&nbsp;740 Reviews</span></span></span></div>)  
+    ratings = rating_container[0].text  
+  
+# print("product_name:"+product_name)  
+    # print("price:"+price)  
+    # print("ratings:"+ str(ratings))  
+  
+     edit_price = ''.join(price.split(','))  
+     sym_rupee = edit_price.split("?")  
+     add_rs_price = "Rs"+sym_rupee[1]  
+     split_price = add_rs_price.split("E")  
+     final_price = split_price[0]  
+  
+     split_rating = str(ratings).split(" ")  
+     final_rating = split_rating[0]  
+  
+     print(product_name.replace(",", "|")+","+final_price+","+final_rating+"\n")  
+f.write(product_name.replace(",", "|")+","+final_price+","+final_rating+"\n")  
+  
+f.close()  
